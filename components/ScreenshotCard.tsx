@@ -29,6 +29,7 @@ export function ScreenshotCard({
   const { file_url, file_name, category, tags, status } = screenshot;
   const visibleTags = tags?.slice(0, 3) ?? [];
   const overflowCount = (tags?.length ?? 0) - visibleTags.length;
+  const colors = CATEGORY_COLORS[normalizeCategory(category)];
 
   return (
     <div className="relative cursor-pointer" onClick={onClick}>
@@ -60,11 +61,7 @@ export function ScreenshotCard({
             processing...
           </span>
         ) : category ? (
-          <span
-            className={`rounded-full px-2 py-0.5 text-xs font-medium ${
-              CATEGORY_COLORS[normalizeCategory(category)]
-            }`}
-          >
+          <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${colors}`}>
             {normalizeCategory(category)}
           </span>
         ) : null}
@@ -72,13 +69,13 @@ export function ScreenshotCard({
         {visibleTags.map((tag) => (
           <span
             key={tag}
-            className="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-600"
+            className={`rounded-full px-2 py-0.5 text-xs ${colors}`}
           >
             {tag}
           </span>
         ))}
         {overflowCount > 0 && (
-          <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-600">
+          <span className={`rounded-full px-2 py-0.5 text-xs ${colors}`}>
             +{overflowCount}
           </span>
         )}

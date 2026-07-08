@@ -3,6 +3,7 @@
 import { useEffect, useRef, type ChangeEvent } from "react";
 import type { Screenshot } from "./ScreenshotCard";
 import type { Album } from "./AlbumCard";
+import { CATEGORY_COLORS, normalizeCategory } from "@/lib/categories";
 
 const NO_ALBUM_VALUE = "__none__";
 const NEW_ALBUM_VALUE = "__new__";
@@ -75,9 +76,13 @@ export function ScreenshotDetailModal({
         )}
 
         {screenshot.category && (
-          <p className="mb-2 text-sm font-medium tracking-wide text-gray-500 uppercase">
-            {screenshot.category}
-          </p>
+          <span
+            className={`mb-2 inline-block rounded-full px-2 py-0.5 text-xs font-medium ${
+              CATEGORY_COLORS[normalizeCategory(screenshot.category)]
+            }`}
+          >
+            {normalizeCategory(screenshot.category)}
+          </span>
         )}
 
         {screenshot.description && (
@@ -89,7 +94,9 @@ export function ScreenshotDetailModal({
             {screenshot.tags.map((tag) => (
               <span
                 key={tag}
-                className="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-600"
+                className={`rounded-full px-2 py-0.5 text-xs ${
+                  CATEGORY_COLORS[normalizeCategory(screenshot.category)]
+                }`}
               >
                 {tag}
               </span>

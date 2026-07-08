@@ -13,15 +13,15 @@ export const CATEGORIES = [
 export type Category = (typeof CATEGORIES)[number];
 
 export const CATEGORY_COLORS: Record<Category, string> = {
-  recipe: "bg-orange-100 text-orange-800",
-  outfit: "bg-pink-100 text-pink-800",
-  travel: "bg-blue-100 text-blue-800",
-  quote: "bg-purple-100 text-purple-800",
-  listing: "bg-green-100 text-green-800",
-  meme: "bg-yellow-100 text-yellow-800",
-  social: "bg-indigo-100 text-indigo-800",
-  receipt: "bg-teal-100 text-teal-800",
-  other: "bg-gray-100 text-gray-800",
+  recipe: "bg-orange-200/30 text-orange-700",
+  outfit: "bg-blue-200/30 text-blue-700",
+  travel: "bg-pink-200/30 text-pink-700",
+  quote: "bg-purple-200/30 text-purple-700",
+  listing: "bg-green-200/30 text-green-700",
+  meme: "bg-yellow-200/30 text-yellow-700",
+  social: "bg-indigo-200/30 text-indigo-700",
+  receipt: "bg-teal-200/30 text-teal-700",
+  other: "bg-gray-200/30 text-gray-700",
 };
 
 export function normalizeCategory(
