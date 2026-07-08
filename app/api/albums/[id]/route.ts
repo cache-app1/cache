@@ -1,10 +1,16 @@
 import { NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
+import { requireUser } from "@/lib/supabaseServer";
 
 export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const auth = await requireUser(request);
+  if ("error" in auth) {
+    return NextResponse.json({ error: auth.error }, { status: 401 });
+  }
+  const { supabase } = auth;
+
   const { id } = await params;
   const { name } = await request.json();
 
@@ -30,6 +36,12 @@ export async function DELETE(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const auth = await requireUser(request);
+  if ("error" in auth) {
+    return NextResponse.json({ error: auth.error }, { status: 401 });
+  }
+  const { supabase } = auth;
+
   const { id } = await params;
 
   const { error: unlinkError } = await supabase

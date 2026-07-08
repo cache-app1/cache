@@ -1,7 +1,13 @@
 import { NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
+import { requireUser } from "@/lib/supabaseServer";
 
 export async function POST(request: Request) {
+  const auth = await requireUser(request);
+  if ("error" in auth) {
+    return NextResponse.json({ error: auth.error }, { status: 401 });
+  }
+  const { supabase, user } = auth;
+
   const { name } = await request.json();
 
   if (!name || typeof name !== "string") {
@@ -10,7 +16,7 @@ export async function POST(request: Request) {
 
   const { data, error } = await supabase
     .from("albums")
-    .insert({ name })
+    .insert({ name, user_id: user.id })
     .select()
     .single();
 
@@ -21,7 +27,13 @@ export async function POST(request: Request) {
   return NextResponse.json(data);
 }
 
-export async function GET() {
+export async function GET(request: Request) {
+  const auth = await requireUser(request);
+  if ("error" in auth) {
+    return NextResponse.json({ error: auth.error }, { status: 401 });
+  }
+  const { supabase } = auth;
+
   const { data, error } = await supabase
     .from("albums")
     .select("*")

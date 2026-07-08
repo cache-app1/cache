@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
+import { requireUser } from "@/lib/supabaseServer";
 
 const CATEGORY_LABELS: Record<string, string> = {
   recipe: "Recipes",
@@ -13,7 +13,13 @@ const CATEGORY_LABELS: Record<string, string> = {
   other: "Other",
 };
 
-export async function POST() {
+export async function POST(request: Request) {
+  const auth = await requireUser(request);
+  if ("error" in auth) {
+    return NextResponse.json({ error: auth.error }, { status: 401 });
+  }
+  const { supabase, user } = auth;
+
   const { data: ungrouped, error: fetchError } = await supabase
     .from("screenshots")
     .select("id, category")
@@ -46,7 +52,11 @@ export async function POST() {
     if (!albumId) {
       const { data: newAlbum, error: createError } = await supabase
         .from("albums")
-        .insert({ name: CATEGORY_LABELS[category] ?? category, category })
+        .insert({
+          name: CATEGORY_LABELS[category] ?? category,
+          category,
+          user_id: user.id,
+        })
         .select()
         .single();
 

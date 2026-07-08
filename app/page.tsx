@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/lib/supabase";
+import { authFetch } from "@/lib/authFetch";
+import { AuthGate } from "@/components/AuthGate";
 import { ScreenshotCard, type Screenshot } from "@/components/ScreenshotCard";
 import { ScreenshotDetailModal } from "@/components/ScreenshotDetailModal";
 import { AlbumCard, type Album } from "@/components/AlbumCard";
@@ -9,12 +11,20 @@ import { SearchBar } from "@/components/SearchBar";
 import { CategoryFilter } from "@/components/CategoryFilter";
 import { BulkActionBar } from "@/components/BulkActionBar";
 import { normalizeCategory, getTopTags } from "@/lib/categories";
+import type { Session } from "@supabase/supabase-js";
+
+const ONBOARDING_KEY = "cache_onboarded";
 
 export default function Home() {
+  return <AuthGate>{(session) => <CacheApp session={session} />}</AuthGate>;
+}
+
+function CacheApp({ session }: { session: Session }) {
   const [screenshots, setScreenshots] = useState<Screenshot[]>([]);
   const [albums, setAlbums] = useState<Album[]>([]);
   const [selectedAlbumId, setSelectedAlbumId] = useState<string | null>(null);
   const [searchResults, setSearchResults] = useState<Screenshot[] | null>(null);
+  const [searchError, setSearchError] = useState<string | null>(null);
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState({ done: 0, total: 0 });
@@ -24,6 +34,7 @@ export default function Home() {
   const [flatView, setFlatView] = useState(false);
   const [selectMode, setSelectMode] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [showOnboarding, setShowOnboarding] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   async function loadScreenshots() {
@@ -37,7 +48,7 @@ export default function Home() {
   }
 
   async function loadAlbums() {
-    const res = await fetch("/api/albums");
+    const res = await authFetch("/api/albums");
     const data = await res.json();
     if (Array.isArray(data)) {
       setAlbums(data);
@@ -47,7 +58,15 @@ export default function Home() {
   useEffect(() => {
     loadScreenshots();
     loadAlbums();
+    if (!localStorage.getItem(ONBOARDING_KEY)) {
+      setShowOnboarding(true);
+    }
   }, []);
+
+  function dismissOnboarding() {
+    localStorage.setItem(ONBOARDING_KEY, "1");
+    setShowOnboarding(false);
+  }
 
   async function handleFiles(files: FileList | null) {
     if (!files || files.length === 0) {
@@ -62,13 +81,14 @@ export default function Home() {
       fileArray.map(async (file) => {
         const formData = new FormData();
         formData.append("file", file);
-        await fetch("/api/upload", { method: "POST", body: formData });
+        await authFetch("/api/upload", { method: "POST", body: formData });
         setUploadProgress((p) => ({ ...p, done: p.done + 1 }));
         await loadScreenshots();
       })
     );
 
     setUploading(false);
+    dismissOnboarding();
   }
 
   async function handleDelete(id: string) {
@@ -76,7 +96,7 @@ export default function Home() {
       return;
     }
     setDeletingIds((prev) => new Set(prev).add(id));
-    const res = await fetch(`/api/screenshots/${id}`, { method: "DELETE" });
+    const res = await authFetch(`/api/screenshots/${id}`, { method: "DELETE" });
     if (res.ok) {
       setScreenshots((prev) => prev.filter((s) => s.id !== id));
       setSearchResults((prev) => prev && prev.filter((s) => s.id !== id));
@@ -92,17 +112,27 @@ export default function Home() {
   async function handleSearch(query: string) {
     setSelectedAlbumId(null);
     setSelectedTag(null);
-    const res = await fetch("/api/search", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ query }),
-    });
-    const results = await res.json();
-    setSearchResults(Array.isArray(results) ? results : []);
+    setSearchError(null);
+    try {
+      const res = await authFetch("/api/search", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ query }),
+      });
+      if (!res.ok) {
+        throw new Error("search request failed");
+      }
+      const results = await res.json();
+      setSearchResults(Array.isArray(results) ? results : []);
+    } catch {
+      setSearchError("Search failed. Try again.");
+      setSearchResults(null);
+    }
   }
 
   function handleClearSearch() {
     setSearchResults(null);
+    setSearchError(null);
   }
 
   function openAlbum(id: string) {
@@ -116,7 +146,7 @@ export default function Home() {
   }
 
   async function createAlbum(name: string): Promise<string> {
-    const res = await fetch("/api/albums", {
+    const res = await authFetch("/api/albums", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name }),
@@ -127,7 +157,7 @@ export default function Home() {
   }
 
   async function moveToAlbum(screenshotId: string, albumId: string | null) {
-    const res = await fetch(`/api/screenshots/${screenshotId}`, {
+    const res = await authFetch(`/api/screenshots/${screenshotId}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ albumId }),
@@ -150,7 +180,7 @@ export default function Home() {
     if (!name || name === current?.name) {
       return;
     }
-    await fetch(`/api/albums/${albumId}`, {
+    await authFetch(`/api/albums/${albumId}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name }),
@@ -166,7 +196,7 @@ export default function Home() {
     if (!confirmed) {
       return;
     }
-    await fetch(`/api/albums/${albumId}`, { method: "DELETE" });
+    await authFetch(`/api/albums/${albumId}`, { method: "DELETE" });
     setSelectedAlbumId(null);
     await loadScreenshots();
     await loadAlbums();
@@ -176,14 +206,14 @@ export default function Home() {
     const shotsToMove = screenshots.filter((s) => s.album_id === sourceAlbumId);
     await Promise.all(
       shotsToMove.map((s) =>
-        fetch(`/api/screenshots/${s.id}`, {
+        authFetch(`/api/screenshots/${s.id}`, {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ albumId: targetAlbumId }),
         })
       )
     );
-    await fetch(`/api/albums/${sourceAlbumId}`, { method: "DELETE" });
+    await authFetch(`/api/albums/${sourceAlbumId}`, { method: "DELETE" });
     setSelectedAlbumId(targetAlbumId);
     await loadScreenshots();
     await loadAlbums();
@@ -191,7 +221,7 @@ export default function Home() {
 
   async function handleAutoSort() {
     setSorting(true);
-    await fetch("/api/albums/auto-sort", { method: "POST" });
+    await authFetch("/api/albums/auto-sort", { method: "POST" });
     await loadScreenshots();
     await loadAlbums();
     setSorting(false);
@@ -235,7 +265,7 @@ export default function Home() {
   async function bulkMoveToAlbum(albumId: string) {
     await Promise.all(
       Array.from(selectedIds).map((id) =>
-        fetch(`/api/screenshots/${id}`, {
+        authFetch(`/api/screenshots/${id}`, {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ albumId }),
@@ -263,7 +293,7 @@ export default function Home() {
     }
     await Promise.all(
       Array.from(selectedIds).map((id) =>
-        fetch(`/api/screenshots/${id}`, { method: "DELETE" })
+        authFetch(`/api/screenshots/${id}`, { method: "DELETE" })
       )
     );
     await loadScreenshots();
@@ -308,16 +338,51 @@ export default function Home() {
   }
 
   return (
-    <main className="mx-auto max-w-5xl p-6">
-      <h1 className="mb-6 text-3xl font-bold">Cache</h1>
+    <main className="mx-auto max-w-5xl p-4 sm:p-6">
+      <div className="mb-6 flex items-center justify-between">
+        <h1 className="text-2xl font-bold sm:text-3xl">Cache</h1>
+        <div className="flex items-center gap-3">
+          <span className="hidden text-xs text-gray-500 sm:inline">
+            {session.user.email}
+          </span>
+          <button
+            onClick={() => supabase.auth.signOut()}
+            className="text-sm text-gray-500 hover:text-black"
+          >
+            Sign out
+          </button>
+        </div>
+      </div>
+
+      {showOnboarding && (
+        <div className="mb-6 flex items-start justify-between gap-4 rounded-lg border bg-gray-50 p-4">
+          <div>
+            <p className="font-medium">Welcome to Cache</p>
+            <p className="text-sm text-gray-600">
+              Upload your screenshots to get started — they&apos;ll be tagged
+              automatically. Then use search or &quot;Sort into albums&quot; to
+              find them later.
+            </p>
+          </div>
+          <button
+            onClick={dismissOnboarding}
+            className="shrink-0 text-sm text-gray-500 hover:text-black"
+          >
+            Got it
+          </button>
+        </div>
+      )}
 
       <SearchBar onSearch={handleSearch} onClear={handleClearSearch} />
+      {searchError && (
+        <p className="mb-4 text-sm text-red-600">{searchError}</p>
+      )}
 
-      <div className="mb-8 flex gap-3">
+      <div className="mb-8 flex flex-wrap gap-2 sm:gap-3">
         <button
           onClick={() => fileInputRef.current?.click()}
           disabled={uploading}
-          className="rounded-lg bg-black px-6 py-3 text-white disabled:opacity-50"
+          className="rounded-lg bg-black px-4 py-2 text-sm text-white disabled:opacity-50 sm:px-6 sm:py-3 sm:text-base"
         >
           {uploading
             ? `Processing ${uploadProgress.done}/${uploadProgress.total}...`
@@ -326,13 +391,13 @@ export default function Home() {
         <button
           onClick={handleSortButtonClick}
           disabled={sorting}
-          className="rounded-lg border border-black px-6 py-3 text-black disabled:opacity-50"
+          className="rounded-lg border border-black px-4 py-2 text-sm text-black disabled:opacity-50 sm:px-6 sm:py-3 sm:text-base"
         >
           {sortButtonLabel}
         </button>
         <button
           onClick={toggleSelectMode}
-          className="rounded-lg border px-6 py-3 text-black disabled:opacity-50"
+          className="rounded-lg border px-4 py-2 text-sm text-black disabled:opacity-50 sm:px-6 sm:py-3 sm:text-base"
         >
           {selectMode ? "Cancel select" : "Select"}
         </button>
@@ -378,12 +443,12 @@ export default function Home() {
           >
             ← Back to albums
           </button>
-          <div className="mb-4 flex items-center justify-between">
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
             <h2 className="text-lg font-semibold">
               {selectedAlbum?.name ?? "Album"}
             </h2>
             {!selectMode && (
-              <div className="flex items-center gap-3">
+              <div className="flex flex-wrap items-center gap-3">
                 <select
                   onChange={async (e) => {
                     const targetId = e.target.value;

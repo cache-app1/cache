@@ -1,9 +1,15 @@
 import { NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
+import { requireUser } from "@/lib/supabaseServer";
 import { analyzeScreenshot } from "@/lib/vision";
 import { embedText } from "@/lib/embeddings";
 
 export async function POST(request: Request) {
+  const auth = await requireUser(request);
+  if ("error" in auth) {
+    return NextResponse.json({ error: auth.error }, { status: 401 });
+  }
+  const { supabase, user } = auth;
+
   const formData = await request.formData();
   const file = formData.get("file") as File;
   const albumId = formData.get("albumId") as string | null;
@@ -31,6 +37,7 @@ export async function POST(request: Request) {
       file_url: urlData.publicUrl,
       file_name: file.name,
       album_id: albumId || null,
+      user_id: user.id,
     })
     .select()
     .single();
