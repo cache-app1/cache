@@ -7,6 +7,7 @@ import { ScreenshotDetailModal } from "@/components/ScreenshotDetailModal";
 import { AlbumCard, type Album } from "@/components/AlbumCard";
 import { SearchBar } from "@/components/SearchBar";
 import { CategoryFilter } from "@/components/CategoryFilter";
+import { BulkActionBar } from "@/components/BulkActionBar";
 import { normalizeCategory } from "@/lib/categories";
 
 export default function Home() {
@@ -21,6 +22,8 @@ export default function Home() {
   const [selected, setSelected] = useState<Screenshot | null>(null);
   const [sorting, setSorting] = useState(false);
   const [flatView, setFlatView] = useState(false);
+  const [selectMode, setSelectMode] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   async function loadScreenshots() {
@@ -169,6 +172,23 @@ export default function Home() {
     await loadAlbums();
   }
 
+  async function handleMergeAlbum(sourceAlbumId: string, targetAlbumId: string) {
+    const shotsToMove = screenshots.filter((s) => s.album_id === sourceAlbumId);
+    await Promise.all(
+      shotsToMove.map((s) =>
+        fetch(`/api/screenshots/${s.id}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ albumId: targetAlbumId }),
+        })
+      )
+    );
+    await fetch(`/api/albums/${sourceAlbumId}`, { method: "DELETE" });
+    setSelectedAlbumId(targetAlbumId);
+    await loadScreenshots();
+    await loadAlbums();
+  }
+
   async function handleAutoSort() {
     setSorting(true);
     await fetch("/api/albums/auto-sort", { method: "POST" });
@@ -192,6 +212,62 @@ export default function Home() {
       ? "All Screenshots"
       : "Sort into albums";
 
+  function toggleSelectMode() {
+    setSelectMode((m) => !m);
+    setSelectedIds(new Set());
+  }
+
+  function toggleSelect(id: string) {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  }
+
+  async function bulkMoveToAlbum(albumId: string) {
+    await Promise.all(
+      Array.from(selectedIds).map((id) =>
+        fetch(`/api/screenshots/${id}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ albumId }),
+        })
+      )
+    );
+    await loadScreenshots();
+    await loadAlbums();
+    setSelectedIds(new Set());
+    setSelectMode(false);
+  }
+
+  async function bulkCreateAlbumAndMove(name: string) {
+    const albumId = await createAlbum(name);
+    await bulkMoveToAlbum(albumId);
+  }
+
+  async function bulkDelete() {
+    if (
+      !window.confirm(
+        `Delete ${selectedIds.size} screenshot${selectedIds.size === 1 ? "" : "s"}? This can't be undone.`
+      )
+    ) {
+      return;
+    }
+    await Promise.all(
+      Array.from(selectedIds).map((id) =>
+        fetch(`/api/screenshots/${id}`, { method: "DELETE" })
+      )
+    );
+    await loadScreenshots();
+    setSelectedIds(new Set());
+    setSelectMode(false);
+  }
+
   const byCategory = (list: Screenshot[]) =>
     selectedCategory
       ? list.filter((s) => normalizeCategory(s.category) === selectedCategory)
@@ -210,6 +286,25 @@ export default function Home() {
     ? byCategory(screenshots.filter((s) => s.album_id === selectedAlbumId))
     : [];
   const selectedAlbum = albums.find((a) => a.id === selectedAlbumId) ?? null;
+
+  function renderGrid(list: Screenshot[]) {
+    return (
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
+        {list.map((s) => (
+          <ScreenshotCard
+            key={s.id}
+            screenshot={s}
+            onClick={() => setSelected(s)}
+            onDelete={() => handleDelete(s.id)}
+            deleting={deletingIds.has(s.id)}
+            selectMode={selectMode}
+            selected={selectedIds.has(s.id)}
+            onToggleSelect={() => toggleSelect(s.id)}
+          />
+        ))}
+      </div>
+    );
+  }
 
   return (
     <main className="mx-auto max-w-5xl p-6">
@@ -234,6 +329,12 @@ export default function Home() {
         >
           {sortButtonLabel}
         </button>
+        <button
+          onClick={toggleSelectMode}
+          className="rounded-lg border px-6 py-3 text-black disabled:opacity-50"
+        >
+          {selectMode ? "Cancel select" : "Select"}
+        </button>
       </div>
       <input
         ref={fileInputRef}
@@ -249,22 +350,23 @@ export default function Home() {
         onSelect={handleSelectCategory}
       />
 
+      {selectMode && selectedIds.size > 0 && (
+        <BulkActionBar
+          count={selectedIds.size}
+          albums={albums}
+          onMove={bulkMoveToAlbum}
+          onCreateAlbumAndMove={bulkCreateAlbumAndMove}
+          onDelete={bulkDelete}
+          onCancel={() => setSelectedIds(new Set())}
+        />
+      )}
+
       {searchResults !== null ? (
         <>
           <h2 className="mb-4 text-lg font-semibold">
             Search results ({searchResults.length})
           </h2>
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
-            {searchResults.map((s) => (
-              <ScreenshotCard
-                key={s.id}
-                screenshot={s}
-                onClick={() => setSelected(s)}
-                onDelete={() => handleDelete(s.id)}
-                deleting={deletingIds.has(s.id)}
-              />
-            ))}
-          </div>
+          {renderGrid(searchResults)}
         </>
       ) : selectedAlbumId ? (
         <>
@@ -278,7 +380,35 @@ export default function Home() {
             <h2 className="text-lg font-semibold">
               {selectedAlbum?.name ?? "Album"}
             </h2>
-            <div className="flex gap-3">
+            <div className="flex items-center gap-3">
+              <select
+                onChange={async (e) => {
+                  const targetId = e.target.value;
+                  if (!targetId || !selectedAlbumId) return;
+                  const target = albums.find((a) => a.id === targetId);
+                  if (
+                    window.confirm(
+                      `Merge "${selectedAlbum?.name}" into "${target?.name}"? This album will be removed.`
+                    )
+                  ) {
+                    await handleMergeAlbum(selectedAlbumId, targetId);
+                  }
+                  e.target.value = "";
+                }}
+                defaultValue=""
+                className="rounded-lg border px-2 py-1 text-sm text-gray-500"
+              >
+                <option value="" disabled>
+                  Merge into...
+                </option>
+                {albums
+                  .filter((a) => a.id !== selectedAlbumId)
+                  .map((a) => (
+                    <option key={a.id} value={a.id}>
+                      {a.name}
+                    </option>
+                  ))}
+              </select>
               <button
                 onClick={() => selectedAlbumId && handleRenameAlbum(selectedAlbumId)}
                 className="text-sm text-gray-500 hover:text-black"
@@ -293,51 +423,21 @@ export default function Home() {
               </button>
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
-            {albumScreenshots.map((s) => (
-              <ScreenshotCard
-                key={s.id}
-                screenshot={s}
-                onClick={() => setSelected(s)}
-                onDelete={() => handleDelete(s.id)}
-                deleting={deletingIds.has(s.id)}
-              />
-            ))}
-          </div>
+          {renderGrid(albumScreenshots)}
         </>
       ) : categoryResults !== null ? (
         <>
           <h2 className="mb-4 text-lg font-semibold capitalize">
             {selectedCategory} ({categoryResults.length})
           </h2>
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
-            {categoryResults.map((s) => (
-              <ScreenshotCard
-                key={s.id}
-                screenshot={s}
-                onClick={() => setSelected(s)}
-                onDelete={() => handleDelete(s.id)}
-                deleting={deletingIds.has(s.id)}
-              />
-            ))}
-          </div>
+          {renderGrid(categoryResults)}
         </>
       ) : flatView ? (
         <>
           <h2 className="mb-4 text-lg font-semibold">
             All screenshots ({byCategory(screenshots).length})
           </h2>
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
-            {byCategory(screenshots).map((s) => (
-              <ScreenshotCard
-                key={s.id}
-                screenshot={s}
-                onClick={() => setSelected(s)}
-                onDelete={() => handleDelete(s.id)}
-                deleting={deletingIds.has(s.id)}
-              />
-            ))}
-          </div>
+          {renderGrid(byCategory(screenshots))}
         </>
       ) : (
         <>
@@ -374,17 +474,7 @@ export default function Home() {
           {ungroupedScreenshots.length > 0 && (
             <>
               <h2 className="mb-4 text-lg font-semibold">All screenshots</h2>
-              <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
-                {ungroupedScreenshots.map((s) => (
-                  <ScreenshotCard
-                    key={s.id}
-                    screenshot={s}
-                    onClick={() => setSelected(s)}
-                    onDelete={() => handleDelete(s.id)}
-                    deleting={deletingIds.has(s.id)}
-                  />
-                ))}
-              </div>
+              {renderGrid(ungroupedScreenshots)}
             </>
           )}
         </>
