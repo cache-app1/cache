@@ -20,6 +20,7 @@ export default function Home() {
   const [deletingIds, setDeletingIds] = useState<Set<string>>(new Set());
   const [selected, setSelected] = useState<Screenshot | null>(null);
   const [sorting, setSorting] = useState(false);
+  const [flatView, setFlatView] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   async function loadScreenshots() {
@@ -65,13 +66,12 @@ export default function Home() {
     );
 
     setUploading(false);
-
-    if (fileArray.length > 1) {
-      await handleAutoSort();
-    }
   }
 
   async function handleDelete(id: string) {
+    if (!window.confirm("Delete this screenshot? This can't be undone.")) {
+      return;
+    }
     setDeletingIds((prev) => new Set(prev).add(id));
     const res = await fetch(`/api/screenshots/${id}`, { method: "DELETE" });
     if (res.ok) {
@@ -141,6 +141,34 @@ export default function Home() {
     await loadAlbums();
   }
 
+  async function handleRenameAlbum(albumId: string) {
+    const current = albums.find((a) => a.id === albumId);
+    const name = window.prompt("Rename album:", current?.name ?? "");
+    if (!name || name === current?.name) {
+      return;
+    }
+    await fetch(`/api/albums/${albumId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name }),
+    });
+    await loadAlbums();
+  }
+
+  async function handleDeleteAlbum(albumId: string) {
+    const current = albums.find((a) => a.id === albumId);
+    const confirmed = window.confirm(
+      `Delete "${current?.name ?? "this album"}"? Screenshots inside won't be deleted, just ungrouped.`
+    );
+    if (!confirmed) {
+      return;
+    }
+    await fetch(`/api/albums/${albumId}`, { method: "DELETE" });
+    setSelectedAlbumId(null);
+    await loadScreenshots();
+    await loadAlbums();
+  }
+
   async function handleAutoSort() {
     setSorting(true);
     await fetch("/api/albums/auto-sort", { method: "POST" });
@@ -148,6 +176,21 @@ export default function Home() {
     await loadAlbums();
     setSorting(false);
   }
+
+  async function handleSortButtonClick() {
+    if (!flatView && albums.length > 0) {
+      setFlatView(true);
+      return;
+    }
+    await handleAutoSort();
+    setFlatView(false);
+  }
+
+  const sortButtonLabel = sorting
+    ? "Sorting..."
+    : !flatView && albums.length > 0
+      ? "All Screenshots"
+      : "Sort into albums";
 
   const byCategory = (list: Screenshot[]) =>
     selectedCategory
@@ -185,11 +228,11 @@ export default function Home() {
             : "Upload screenshots"}
         </button>
         <button
-          onClick={handleAutoSort}
+          onClick={handleSortButtonClick}
           disabled={sorting}
           className="rounded-lg border border-black px-6 py-3 text-black disabled:opacity-50"
         >
-          {sorting ? "Sorting..." : "Sort into albums"}
+          {sortButtonLabel}
         </button>
       </div>
       <input
@@ -231,9 +274,25 @@ export default function Home() {
           >
             ← Back to albums
           </button>
-          <h2 className="mb-4 text-lg font-semibold">
-            {selectedAlbum?.name ?? "Album"}
-          </h2>
+          <div className="mb-4 flex items-center justify-between">
+            <h2 className="text-lg font-semibold">
+              {selectedAlbum?.name ?? "Album"}
+            </h2>
+            <div className="flex gap-3">
+              <button
+                onClick={() => selectedAlbumId && handleRenameAlbum(selectedAlbumId)}
+                className="text-sm text-gray-500 hover:text-black"
+              >
+                Rename
+              </button>
+              <button
+                onClick={() => selectedAlbumId && handleDeleteAlbum(selectedAlbumId)}
+                className="text-sm text-red-500 hover:text-red-700"
+              >
+                Delete album
+              </button>
+            </div>
+          </div>
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
             {albumScreenshots.map((s) => (
               <ScreenshotCard
@@ -263,6 +322,23 @@ export default function Home() {
             ))}
           </div>
         </>
+      ) : flatView ? (
+        <>
+          <h2 className="mb-4 text-lg font-semibold">
+            All screenshots ({byCategory(screenshots).length})
+          </h2>
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
+            {byCategory(screenshots).map((s) => (
+              <ScreenshotCard
+                key={s.id}
+                screenshot={s}
+                onClick={() => setSelected(s)}
+                onDelete={() => handleDelete(s.id)}
+                deleting={deletingIds.has(s.id)}
+              />
+            ))}
+          </div>
+        </>
       ) : (
         <>
           {albums.length > 0 && (
@@ -273,12 +349,20 @@ export default function Home() {
                   const albumShots = screenshots.filter(
                     (s) => s.album_id === album.id
                   );
+                  const albumCategories = Array.from(
+                    new Set(
+                      albumShots
+                        .map((s) => normalizeCategory(s.category))
+                        .filter(Boolean)
+                    )
+                  );
                   return (
                     <AlbumCard
                       key={album.id}
                       album={album}
                       coverUrl={albumShots[0]?.file_url ?? null}
                       count={albumShots.length}
+                      categories={albumCategories}
                       onClick={() => openAlbum(album.id)}
                     />
                   );
