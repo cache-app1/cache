@@ -13,16 +13,16 @@ export type Screenshot = {
   album_id: string | null;
 };
 
-const CATEGORY_COLORS: Record<string, string> = {
-  recipe: "bg-orange-100 text-orange-800",
-  outfit: "bg-pink-100 text-pink-800",
-  travel: "bg-blue-100 text-blue-800",
-  quote: "bg-purple-100 text-purple-800",
-  listing: "bg-green-100 text-green-800",
-  meme: "bg-yellow-100 text-yellow-800",
-  social: "bg-indigo-100 text-indigo-800",
-  receipt: "bg-teal-100 text-teal-800",
-  other: "bg-gray-100 text-gray-800",
+export const CATEGORY_COLORS: Record<string, string> = {
+  recipe: "bg-orange-50 text-orange-700",
+  outfit: "bg-pink-50 text-pink-700",
+  travel: "bg-purple-50 text-purple-700",
+  quote: "bg-blue-50 text-blue-700",
+  listing: "bg-green-50 text-green-700",
+  meme: "bg-yellow-50 text-yellow-700",
+  social: "bg-indigo-50 text-indigo-700",
+  receipt: "bg-teal-50 text-teal-700",
+  other: "bg-gray-50 text-gray-700",
 };
 
 export function ScreenshotCard({
@@ -39,6 +39,7 @@ export function ScreenshotCard({
   const { file_url, file_name, category, tags, status } = screenshot;
   const visibleTags = tags?.slice(0, 3) ?? [];
   const overflowCount = (tags?.length ?? 0) - visibleTags.length;
+  const colors = CATEGORY_COLORS[category ?? "other"] ?? CATEGORY_COLORS.other;
 
   return (
     <div className="relative cursor-pointer" onClick={onClick}>
@@ -70,11 +71,7 @@ export function ScreenshotCard({
             processing...
           </span>
         ) : category ? (
-          <span
-            className={`rounded-full px-2 py-0.5 text-xs font-medium ${
-              CATEGORY_COLORS[category] ?? CATEGORY_COLORS.other
-            }`}
-          >
+          <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${colors}`}>
             {category}
           </span>
         ) : null}
@@ -82,13 +79,13 @@ export function ScreenshotCard({
         {visibleTags.map((tag) => (
           <span
             key={tag}
-            className="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-600"
+            className={`rounded-full px-2 py-0.5 text-xs ${colors}`}
           >
             {tag}
           </span>
         ))}
         {overflowCount > 0 && (
-          <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-600">
+          <span className={`rounded-full px-2 py-0.5 text-xs ${colors}`}>
             +{overflowCount}
           </span>
         )}

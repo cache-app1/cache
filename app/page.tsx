@@ -16,6 +16,7 @@ export default function Home() {
   const [uploadProgress, setUploadProgress] = useState({ done: 0, total: 0 });
   const [deletingIds, setDeletingIds] = useState<Set<string>>(new Set());
   const [selected, setSelected] = useState<Screenshot | null>(null);
+  const [sorting, setSorting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   async function loadScreenshots() {
@@ -150,6 +151,14 @@ export default function Home() {
     await loadAlbums();
   }
 
+  async function handleAutoSort() {
+    setSorting(true);
+    await fetch("/api/albums/auto-sort", { method: "POST" });
+    await loadScreenshots();
+    await loadAlbums();
+    setSorting(false);
+  }
+
   const ungroupedScreenshots = screenshots.filter((s) => !s.album_id);
   const albumScreenshots = selectedAlbumId
     ? screenshots.filter((s) => s.album_id === selectedAlbumId)
@@ -162,15 +171,24 @@ export default function Home() {
 
       <SearchBar onSearch={handleSearch} onClear={handleClearSearch} />
 
-      <button
-        onClick={() => fileInputRef.current?.click()}
-        disabled={uploading}
-        className="mb-8 rounded-lg bg-black px-6 py-3 text-white disabled:opacity-50"
-      >
-        {uploading
-          ? `Processing ${uploadProgress.done}/${uploadProgress.total}...`
-          : "Upload screenshots"}
-      </button>
+      <div className="mb-8 flex gap-3">
+        <button
+          onClick={() => fileInputRef.current?.click()}
+          disabled={uploading}
+          className="rounded-lg bg-black px-6 py-3 text-white disabled:opacity-50"
+        >
+          {uploading
+            ? `Processing ${uploadProgress.done}/${uploadProgress.total}...`
+            : "Upload screenshots"}
+        </button>
+        <button
+          onClick={handleAutoSort}
+          disabled={sorting || ungroupedScreenshots.length === 0}
+          className="rounded-lg border border-black px-6 py-3 text-black disabled:opacity-50"
+        >
+          {sorting ? "Sorting..." : "Sort into albums"}
+        </button>
+      </div>
       <input
         ref={fileInputRef}
         type="file"
