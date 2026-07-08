@@ -2,12 +2,18 @@
 
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/lib/supabase";
+import ScreenshotCard from "./components/ScreenshotCard";
 
 type Screenshot = {
   id: string;
   file_url: string;
   file_name: string;
   created_at: string;
+  extracted_text?: string | null;
+  category?: string | null;
+  tags?: string[] | null;
+  description?: string | null;
+  status?: string | null;
 };
 
 export default function Home() {
@@ -45,7 +51,7 @@ export default function Home() {
 
   return (
     <main className="mx-auto max-w-5xl p-6">
-      <h1 className="mb-6 text-3xl font-bold">Stash</h1>
+      <h1 className="mb-6 text-3xl font-bold">Cache</h1>
       <button
         onClick={() => fileInputRef.current?.click()}
         disabled={uploading}
@@ -63,12 +69,7 @@ export default function Home() {
       />
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
         {screenshots.map((s) => (
-          <img
-            key={s.id}
-            src={s.file_url}
-            alt={s.file_name}
-            className="w-full rounded-lg object-cover"
-          />
+          <ScreenshotCard key={s.id} screenshot={s} />
         ))}
       </div>
     </main>
