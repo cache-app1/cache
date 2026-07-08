@@ -1,5 +1,7 @@
 "use client";
 
+import { CATEGORY_COLORS, normalizeCategory } from "@/lib/categories";
+
 export type Screenshot = {
   id: string;
   file_url: string;
@@ -11,18 +13,6 @@ export type Screenshot = {
   description: string | null;
   status: string | null;
   album_id: string | null;
-};
-
-export const CATEGORY_COLORS: Record<string, string> = {
-  recipe: "bg-orange-200/30 text-orange-700",
-  outfit: "bg-blue-200/30 text-blue-700",
-  travel: "bg-pink-200/30 text-pink-700",
-  quote: "bg-purple-200/30 text-purple-700",
-  listing: "bg-green-200/30 text-green-700",
-  meme: "bg-yellow-200/30 text-yellow-700",
-  social: "bg-indigo-200/30 text-indigo-700",
-  receipt: "bg-teal-200/30 text-teal-700",
-  other: "bg-gray-200/30 text-gray-700",
 };
 
 export function ScreenshotCard({
@@ -39,7 +29,7 @@ export function ScreenshotCard({
   const { file_url, file_name, category, tags, status } = screenshot;
   const visibleTags = tags?.slice(0, 3) ?? [];
   const overflowCount = (tags?.length ?? 0) - visibleTags.length;
-  const colors = CATEGORY_COLORS[category ?? "other"] ?? CATEGORY_COLORS.other;
+  const colors = CATEGORY_COLORS[normalizeCategory(category)];
 
   return (
     <div className="relative cursor-pointer" onClick={onClick}>
@@ -72,7 +62,7 @@ export function ScreenshotCard({
           </span>
         ) : category ? (
           <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${colors}`}>
-            {category}
+            {normalizeCategory(category)}
           </span>
         ) : null}
 

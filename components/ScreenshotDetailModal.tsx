@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useRef, type ChangeEvent } from "react";
-import { CATEGORY_COLORS, type Screenshot } from "./ScreenshotCard";
+import type { Screenshot } from "./ScreenshotCard";
 import type { Album } from "./AlbumCard";
+import { CATEGORY_COLORS, normalizeCategory } from "@/lib/categories";
 
 const NO_ALBUM_VALUE = "__none__";
 const NEW_ALBUM_VALUE = "__new__";
@@ -77,10 +78,10 @@ export function ScreenshotDetailModal({
         {screenshot.category && (
           <span
             className={`mb-2 inline-block rounded-full px-2 py-0.5 text-xs font-medium ${
-              CATEGORY_COLORS[screenshot.category] ?? CATEGORY_COLORS.other
+              CATEGORY_COLORS[normalizeCategory(screenshot.category)]
             }`}
           >
-            {screenshot.category}
+            {normalizeCategory(screenshot.category)}
           </span>
         )}
 
@@ -94,8 +95,7 @@ export function ScreenshotDetailModal({
               <span
                 key={tag}
                 className={`rounded-full px-2 py-0.5 text-xs ${
-                  CATEGORY_COLORS[screenshot.category ?? "other"] ??
-                  CATEGORY_COLORS.other
+                  CATEGORY_COLORS[normalizeCategory(screenshot.category)]
                 }`}
               >
                 {tag}
