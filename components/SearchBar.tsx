@@ -29,13 +29,13 @@ export function SearchBar({
   }
 
   return (
-    <form onSubmit={handleSubmit} className="mb-6 flex gap-2">
+    <form onSubmit={handleSubmit} className="mb-6 flex flex-wrap gap-2">
       <input
         type="text"
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         placeholder="Search your screenshots..."
-        className="flex-1 rounded-lg border px-4 py-2 text-sm"
+        className="min-w-0 flex-1 rounded-lg border px-4 py-2 text-sm"
       />
       <button
         type="submit"
