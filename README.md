@@ -51,7 +51,7 @@ Whether it's a recipe you saved weeks ago, a travel itinerary, a receipt, a note
 - TypeScript
 - Tailwind CSS
 - Supabase
-- AI-powered OCR and semantic search
+- AI-powered categorization
 
 ---
 
@@ -95,9 +95,9 @@ Instead of remembering when you saved something, you only need to remember what 
 ### Varnika Dokka
 - Led frontend development and user experience improvements
 - Implemented authentication, onboarding, and search functionality
-- Built and refined the interface, responsive layouts, and deployment
+- Designed and refined the interface, responsive layouts, and deployment
 
 ### Aarohi Gandhi
-- Designed the backend architecture and data organization
+- Designed the backend development/architecture and data organization
 - Developed the AI-powered screenshot processing pipeline
 - Integrated screenshot analysis and automatic categorization
