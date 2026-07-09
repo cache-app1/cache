@@ -16,7 +16,7 @@ const SHOWCASE_TAGS: { label: string; category: Category; rotate: string }[] = [
 const FEATURES: { title: string; body: string; category: Category }[] = [
   {
     title: "Search that understands content",
-    body: 'Not just OCR keyword match — ask for "recipes under 30 minutes" and get the right screenshot back.',
+    body: 'Not just OCR keyword match - ask for "recipes under 30 minutes" and get the right screenshot back.',
     category: "recipe",
   },
   {
@@ -26,7 +26,7 @@ const FEATURES: { title: string; body: string; category: Category }[] = [
   },
   {
     title: "Private by default",
-    body: "Every screenshot is scoped to your account with row-level security — no one else can ever see what you upload, whether you sign in or use a guest account.",
+    body: "Every screenshot is scoped to your account with row-level security - no one else can ever see what you upload, whether you sign in or use a guest account.",
     category: "travel",
   },
 ];
