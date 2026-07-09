@@ -2,125 +2,67 @@
 
 **Stop scrolling. Start searching.**
 
-Cache is an AI-powered screenshot manager that transforms your camera roll into a searchable library. Instead of scrolling through hundreds of saved screenshots, Cache automatically extracts text, understands context, categorizes your content, and helps you find exactly what you're looking for using natural language.
+You've got hundreds of screenshots — recipes, travel plans, receipts, outfits — and no real way to find any of them. Cache reads every screenshot with AI, works out what it is, and lets you search your whole camera roll in plain English. You don't have to remember *when* you saved something, just *what* it was.
 
-Whether it's a recipe you saved weeks ago, a travel itinerary, a receipt, a note, or an outfit inspiration post, Cache makes your screenshots easy to organize and even easier to find.
-
-**Live Demo:** https://cache-cacheshots.vercel.app
+**[Try it live →](https://cache-cacheshots.vercel.app)**
 
 <p align="center">
-  <img src="docs/assets/before-after.png" alt="Before and after: an unsearchable camera roll versus Cache's categorized, searchable grid" width="640">
-</p>
-
-## Demo
-
-<p align="center">
-  <img src="cache-demo.png" alt="Cache Demo" width="640">
+  <img src="cache-demo.png" alt="The Cache app: a searchable grid of categorized screenshots" width="640">
 </p>
 
 ---
 
-## Features
+## What it does
 
-- **Natural Language Search**
-  - Search using everyday language, such as:
-    - "Show me the pasta recipe I saved."
-    - "Find my Seattle itinerary."
-    - "Receipt from Costco."
-
-- **AI-Powered Organization**
-  - Automatically extracts text from screenshots and categorizes them based on their content.
-
-- **Smart Categories**
-  - Organizes screenshots into categories such as recipes, travel, shopping, receipts, notes, quotes, events, social media, and more.
-
-- **Responsive Interface**
-  - A clean, modern interface designed for fast browsing and effortless searching across devices.
-
-- **Secure Authentication**
-  - User accounts ensure screenshots remain private and accessible only to their owner.
-
-- **Private by Design**
-  - Every screenshot is scoped to your account with row-level security in the database — no one else can ever see what you upload, whether you sign in with an account or use a guest session.
-
----
-
-## How It Works
+- **Search the way you talk.** "That pasta recipe I saved" or "my Seattle itinerary" — Cache goes off what you mean, not just matching keywords.
+- **Organizes itself.** Every screenshot gets read, categorized, and tagged the moment you upload it. No folders, no sorting.
+- **Stays private.** Your screenshots are locked to your account with row-level security — no one else can see what you upload, signed in or as a guest.
 
 <p align="center">
-  <img src="docs/assets/how-it-works-diagram.png" alt="Upload, AI reads it, organized automatically, search in plain English" width="640">
+  <img src="docs/assets/before-after.png" alt="Before: an unsearchable pile of screenshots. After: a clean, categorized, searchable grid" width="640">
 </p>
 
-1. Upload your screenshots.
-2. Cache extracts text and analyzes the content.
-3. Screenshots are automatically categorized and indexed.
-4. Search using natural language to instantly find what you're looking for.
-
 ---
 
-## Tech Stack
-
-- Next.js
-- TypeScript
-- Tailwind CSS
-- Supabase
-- AI-powered categorization
-
----
-
-## Architecture
+## How it works
 
 <p align="center">
-  <img src="docs/assets/architecture-diagram.png" alt="System architecture: Next.js browser, upload/search API routes, Supabase Storage, Claude Vision, Embeddings API, and the Postgres + pgvector screenshots table" width="640">
+  <img src="docs/assets/how-it-works-diagram.png" alt="Upload, AI reads it, it's organized automatically, then you search in plain English" width="640">
 </p>
 
-See [docs/architecture.md](docs/architecture.md) for the full writeup, including design tradeoffs, latency/cost budget, and the category taxonomy.
+Upload a screenshot, an AI model pulls out the text and figures out what it is, it gets tagged and indexed, and later you find it by describing it in your own words.
 
 ---
 
-## Getting Started
+## Under the hood
 
-Clone the repository:
+<p align="center">
+  <img src="docs/assets/architecture-diagram.png" alt="Cache system architecture" width="640">
+</p>
+
+Next.js and Tailwind on Vercel, with Supabase handling auth, file storage, and a Postgres + pgvector database. A vision model reads each screenshot; embeddings power the semantic search. Full writeup in [docs/architecture.md](docs/architecture.md).
+
+---
+
+## Run it locally
 
 ```bash
 git clone https://github.com/aarohigandhi/cache.git
 cd cache
-```
-
-Install dependencies:
-
-```bash
 npm install
 ```
 
-Create a `.env.local` file using the provided `.env.example`.
-
-Start the development server:
+Copy `.env.example` to `.env.local` and add your keys, then:
 
 ```bash
 npm run dev
 ```
 
-Open `http://localhost:3000` in your browser.
+Open [http://localhost:3000](http://localhost:3000).
 
 ---
 
-## Vision
+## Who built it
 
-People save screenshots because they don't want to lose information, but finding that information later is often frustrating. Cache transforms your screenshot collection into a searchable knowledge base by combining AI-powered understanding with an intuitive interface.
-
-Instead of remembering when you saved something, you only need to remember what it was.
-
----
-
-## Contributors
-
-### Varnika Dokka
-- Led frontend development and user experience improvements
-- Implemented authentication, onboarding, and search functionality
-- Designed and refined the interface, responsive layouts, and deployment
-
-### Aarohi Gandhi
-- Led backend development/architecture and data organization
-- Developed the AI-powered screenshot processing pipeline and metadata extraction
-- Integrated screenshot analysis and automatic categorization
+**Varnika Dokka** — the frontend: auth, onboarding, and the whole search experience.
+**Aarohi Gandhi** — the backend and the AI pipeline that reads, tags, and organizes every screenshot.
