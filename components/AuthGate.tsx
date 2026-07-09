@@ -26,7 +26,7 @@ const FEATURES: { title: string; body: string; category: Category }[] = [
   },
   {
     title: "Private by default",
-    body: "Your screenshots are yours — sign in or try it as a guest, no strings attached.",
+    body: "Every screenshot is scoped to your account with row-level security — no one else can ever see what you upload, whether you sign in or use a guest account.",
     category: "travel",
   },
 ];

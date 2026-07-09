@@ -8,10 +8,14 @@ Whether it's a recipe you saved weeks ago, a travel itinerary, a receipt, a note
 
 **Live Demo:** https://cache-cacheshots.vercel.app
 
+<p align="center">
+  <img src="docs/assets/before-after.png" alt="Before and after: an unsearchable camera roll versus Cache's categorized, searchable grid" width="640">
+</p>
+
 ## Demo
 
 <p align="center">
-  <img src="cache-demo.png" alt="Cache Demo" width="900">
+  <img src="cache-demo.png" alt="Cache Demo" width="640">
 </p>
 
 ---
@@ -36,9 +40,16 @@ Whether it's a recipe you saved weeks ago, a travel itinerary, a receipt, a note
 - **Secure Authentication**
   - User accounts ensure screenshots remain private and accessible only to their owner.
 
+- **Private by Design**
+  - Every screenshot is scoped to your account with row-level security in the database — no one else can ever see what you upload, whether you sign in with an account or use a guest session.
+
 ---
 
 ## How It Works
+
+<p align="center">
+  <img src="docs/assets/how-it-works-diagram.png" alt="Upload, AI reads it, organized automatically, search in plain English" width="640">
+</p>
 
 1. Upload your screenshots.
 2. Cache extracts text and analyzes the content.
@@ -54,6 +65,16 @@ Whether it's a recipe you saved weeks ago, a travel itinerary, a receipt, a note
 - Tailwind CSS
 - Supabase
 - AI-powered categorization
+
+---
+
+## Architecture
+
+<p align="center">
+  <img src="docs/assets/architecture-diagram.png" alt="System architecture: Next.js browser, upload/search API routes, Supabase Storage, Claude Vision, Embeddings API, and the Postgres + pgvector screenshots table" width="640">
+</p>
+
+See [docs/architecture.md](docs/architecture.md) for the full writeup, including design tradeoffs, latency/cost budget, and the category taxonomy.
 
 ---
 
