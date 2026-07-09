@@ -29,18 +29,18 @@ export function SearchBar({
   }
 
   return (
-    <form onSubmit={handleSubmit} className="mb-6 flex flex-wrap gap-2">
+    <form onSubmit={handleSubmit} className="mb-8 flex flex-wrap gap-3">
       <input
         type="text"
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         placeholder="Search your screenshots..."
-        className="min-w-0 flex-1 rounded-lg border px-4 py-2 text-sm"
+        className="min-w-0 flex-1 rounded-xl border border-zinc-200 bg-white px-5 py-3.5 text-base text-zinc-900 shadow-sm transition-colors placeholder:text-zinc-400 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/30 focus:outline-none"
       />
       <button
         type="submit"
         disabled={searching}
-        className="rounded-lg bg-black px-4 py-2 text-sm text-white disabled:opacity-50"
+        className="rounded-xl bg-zinc-900 px-6 py-3.5 text-sm font-medium text-white shadow-sm transition-colors hover:bg-zinc-800 disabled:opacity-50"
       >
         {searching ? "Searching..." : "Search"}
       </button>
@@ -48,7 +48,7 @@ export function SearchBar({
         <button
           type="button"
           onClick={handleClear}
-          className="rounded-lg border px-4 py-2 text-sm"
+          className="rounded-xl border border-zinc-200 px-5 py-3.5 text-sm text-zinc-600 transition-colors hover:border-zinc-300 hover:bg-zinc-50"
         >
           Clear
         </button>

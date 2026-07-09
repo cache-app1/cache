@@ -14,13 +14,13 @@ export function CategoryFilter({
   }
 
   return (
-    <div className="mb-6 flex flex-wrap gap-2">
+    <div className="mb-8 flex flex-wrap gap-2.5">
       <button
         onClick={() => onSelect(null)}
         className={`rounded-full px-3 py-1 text-sm font-medium transition-colors ${
           selected === null
-            ? "bg-black text-white"
-            : "border border-gray-300 text-gray-600 hover:bg-gray-50"
+            ? "bg-indigo-600 text-white shadow-sm"
+            : "border border-zinc-200 text-zinc-600 hover:border-zinc-300 hover:bg-zinc-50"
         }`}
       >
         All
@@ -31,8 +31,8 @@ export function CategoryFilter({
           onClick={() => onSelect(tag)}
           className={`rounded-full px-3 py-1 text-sm font-medium capitalize transition-colors ${
             selected === tag
-              ? "bg-black text-white"
-              : "border border-gray-300 text-gray-600 hover:bg-gray-50"
+              ? "bg-indigo-600 text-white shadow-sm"
+              : "border border-zinc-200 text-zinc-600 hover:border-zinc-300 hover:bg-zinc-50"
           }`}
         >
           {tag}

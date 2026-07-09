@@ -34,12 +34,12 @@ export function BulkActionBar({
   }
 
   return (
-    <div className="mb-6 flex flex-wrap items-center gap-3 rounded-lg border bg-gray-50 px-4 py-3">
-      <span className="text-sm font-medium">{count} selected</span>
+    <div className="mb-8 flex flex-wrap items-center gap-3 rounded-xl border border-zinc-200 bg-white px-4 py-3 shadow-sm">
+      <span className="text-sm font-medium text-zinc-900">{count} selected</span>
       <select
         onChange={handleMoveChange}
         defaultValue=""
-        className="rounded-lg border px-3 py-1.5 text-sm"
+        className="rounded-lg border border-zinc-200 px-3 py-1.5 text-sm text-zinc-700 transition-colors hover:border-zinc-300"
       >
         <option value="" disabled>
           Move to album...
@@ -53,13 +53,13 @@ export function BulkActionBar({
       </select>
       <button
         onClick={onDelete}
-        className="rounded-lg border border-red-300 px-3 py-1.5 text-sm text-red-600 hover:bg-red-50"
+        className="rounded-lg border border-red-200 px-3 py-1.5 text-sm text-red-600 transition-colors hover:bg-red-50"
       >
         Delete selected
       </button>
       <button
         onClick={onCancel}
-        className="ml-auto text-sm text-gray-500 hover:text-black"
+        className="ml-auto text-sm text-zinc-500 transition-colors hover:text-zinc-900"
       >
         Cancel
       </button>
