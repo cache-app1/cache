@@ -2,7 +2,7 @@
 
 **Stop scrolling. Start searching.**
 
-You've got hundreds of screenshots — recipes, travel plans, receipts, outfits — and no real way to find any of them. Cache reads every screenshot with AI, works out what it is, and lets you search your whole camera roll in plain English. You don't have to remember *when* you saved something, just *what* it was.
+You've got hundreds of screenshots - recipes, travel plans, receipts, outfits - and no real way to find any of them. Cache reads every screenshot with AI, works out what it is, and lets you search your whole camera roll in plain English. You don't have to remember *when* you saved something, just *what* it was.
 
 **[Try it live →](https://cache-cacheshots.vercel.app)**
 
@@ -14,9 +14,9 @@ You've got hundreds of screenshots — recipes, travel plans, receipts, outfits 
 
 ## What it does
 
-- **Search the way you talk.** "That pasta recipe I saved" or "my Seattle itinerary" — Cache goes off what you mean, not just matching keywords.
+- **Search the way you talk.** "That pasta recipe I saved" or "my Seattle itinerary" - Cache goes off what you mean, not just matching keywords.
 - **Organizes itself.** Every screenshot gets read, categorized, and tagged the moment you upload it. No folders, no sorting.
-- **Stays private.** Your screenshots are locked to your account with row-level security — no one else can see what you upload, signed in or as a guest.
+- **Stays private.** Your screenshots are locked to your account with row-level security - no one else can see what you upload, signed in or as a guest.
 
 <p align="center">
   <img src="docs/assets/before-after.png" alt="Before: an unsearchable pile of screenshots. After: a clean, categorized, searchable grid" width="640">
@@ -64,5 +64,5 @@ Open [http://localhost:3000](http://localhost:3000).
 
 ## Who built it
 
-- **Varnika Dokka** — the frontend: auth, onboarding, and the whole search experience.
+- **Varnika Dokka** - the frontend: auth, onboarding, and the whole user search experience.
 - **Aarohi Gandhi** — the backend and the AI pipeline that reads, tags, and organizes every screenshot.
