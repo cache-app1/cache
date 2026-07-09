@@ -369,7 +369,7 @@ function CacheApp({ session }: { session: Session }) {
           <div>
             <p className="font-medium text-zinc-900">Welcome to Cache</p>
             <p className="text-sm text-zinc-500">
-              Upload your screenshots to get started — they&apos;ll be tagged
+              Upload your screenshots to get started - they&apos;ll be tagged
               automatically. Then use search or &quot;Sort into albums&quot; to
               find them later.
             </p>
