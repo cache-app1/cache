@@ -11,6 +11,7 @@ Whether it's a recipe you saved weeks ago, a travel itinerary, a receipt, a note
 <p align="center">
   <img src="cache-demo.png" alt="Cache Demo" width="900">
 </p>
+
 ---
 
 ## Features
