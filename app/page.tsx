@@ -320,7 +320,7 @@ function CacheApp({ session }: { session: Session }) {
 
   function renderGrid(list: Screenshot[]) {
     return (
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
+      <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 md:grid-cols-4">
         {list.map((s) => (
           <ScreenshotCard
             key={s.id}
@@ -338,16 +338,23 @@ function CacheApp({ session }: { session: Session }) {
   }
 
   return (
-    <main className="mx-auto max-w-5xl p-4 sm:p-6">
-      <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-bold sm:text-3xl">Cache</h1>
-        <div className="flex items-center gap-3">
-          <span className="hidden text-xs text-gray-500 sm:inline">
+    <main className="mx-auto max-w-screen-xl px-6 py-10 sm:px-8 sm:py-14">
+      <div className="mb-10 flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight text-zinc-900 italic sm:text-4xl">
+            Cache
+          </h1>
+          <p className="mt-1.5 text-sm text-zinc-500">
+            Search everything you&apos;ve saved.
+          </p>
+        </div>
+        <div className="flex items-center gap-4 pt-1">
+          <span className="hidden text-xs text-zinc-400 sm:inline">
             {session.user.email}
           </span>
           <button
             onClick={() => supabase.auth.signOut()}
-            className="text-sm text-gray-500 hover:text-black"
+            className="text-sm text-zinc-500 transition-colors hover:text-zinc-900"
           >
             Sign out
           </button>
@@ -355,10 +362,10 @@ function CacheApp({ session }: { session: Session }) {
       </div>
 
       {showOnboarding && (
-        <div className="mb-6 flex items-start justify-between gap-4 rounded-lg border bg-gray-50 p-4">
+        <div className="mb-10 flex items-start justify-between gap-4 rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm">
           <div>
-            <p className="font-medium">Welcome to Cache</p>
-            <p className="text-sm text-gray-600">
+            <p className="font-medium text-zinc-900">Welcome to Cache</p>
+            <p className="text-sm text-zinc-500">
               Upload your screenshots to get started — they&apos;ll be tagged
               automatically. Then use search or &quot;Sort into albums&quot; to
               find them later.
@@ -366,7 +373,7 @@ function CacheApp({ session }: { session: Session }) {
           </div>
           <button
             onClick={dismissOnboarding}
-            className="shrink-0 text-sm text-gray-500 hover:text-black"
+            className="shrink-0 text-sm text-zinc-500 transition-colors hover:text-zinc-900"
           >
             Got it
           </button>
@@ -378,11 +385,11 @@ function CacheApp({ session }: { session: Session }) {
         <p className="mb-4 text-sm text-red-600">{searchError}</p>
       )}
 
-      <div className="mb-8 flex flex-wrap gap-2 sm:gap-3">
+      <div className="mb-10 flex flex-wrap gap-3">
         <button
           onClick={() => fileInputRef.current?.click()}
           disabled={uploading}
-          className="rounded-lg bg-black px-4 py-2 text-sm text-white disabled:opacity-50 sm:px-6 sm:py-3 sm:text-base"
+          className="rounded-xl bg-zinc-900 px-5 py-3 text-sm font-medium text-white shadow-sm transition-colors hover:bg-zinc-800 disabled:opacity-50 sm:px-6 sm:py-3.5 sm:text-base"
         >
           {uploading
             ? `Processing ${uploadProgress.done}/${uploadProgress.total}...`
@@ -391,13 +398,13 @@ function CacheApp({ session }: { session: Session }) {
         <button
           onClick={handleSortButtonClick}
           disabled={sorting}
-          className="rounded-lg border border-black px-4 py-2 text-sm text-black disabled:opacity-50 sm:px-6 sm:py-3 sm:text-base"
+          className="rounded-xl border border-zinc-200 px-5 py-3 text-sm font-medium text-zinc-700 transition-colors hover:border-zinc-300 hover:bg-zinc-50 disabled:opacity-50 sm:px-6 sm:py-3.5 sm:text-base"
         >
           {sortButtonLabel}
         </button>
         <button
           onClick={toggleSelectMode}
-          className="rounded-lg border px-4 py-2 text-sm text-black disabled:opacity-50 sm:px-6 sm:py-3 sm:text-base"
+          className="rounded-xl border border-zinc-200 px-5 py-3 text-sm font-medium text-zinc-700 transition-colors hover:border-zinc-300 hover:bg-zinc-50 disabled:opacity-50 sm:px-6 sm:py-3.5 sm:text-base"
         >
           {selectMode ? "Cancel select" : "Select"}
         </button>
@@ -430,7 +437,7 @@ function CacheApp({ session }: { session: Session }) {
 
       {searchResults !== null ? (
         <>
-          <h2 className="mb-4 text-lg font-semibold">
+          <h2 className="mb-5 text-xl font-bold tracking-tight text-zinc-900">
             Search results ({searchResults.length})
           </h2>
           {renderGrid(searchResults)}
@@ -439,12 +446,12 @@ function CacheApp({ session }: { session: Session }) {
         <>
           <button
             onClick={() => setSelectedAlbumId(null)}
-            className="mb-4 text-sm text-gray-500 hover:text-black"
+            className="mb-4 text-sm text-zinc-500 transition-colors hover:text-zinc-900"
           >
             ← Back to albums
           </button>
-          <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
-            <h2 className="text-lg font-semibold">
+          <div className="mb-5 flex flex-wrap items-center justify-between gap-2">
+            <h2 className="text-xl font-bold tracking-tight text-zinc-900">
               {selectedAlbum?.name ?? "Album"}
             </h2>
             {!selectMode && (
@@ -464,7 +471,7 @@ function CacheApp({ session }: { session: Session }) {
                     e.target.value = "";
                   }}
                   defaultValue=""
-                  className="rounded-lg border px-2 py-1 text-sm text-gray-500"
+                  className="rounded-lg border border-zinc-200 px-2 py-1 text-sm text-zinc-500 transition-colors hover:border-zinc-300"
                 >
                   <option value="" disabled>
                     Merge into...
@@ -479,13 +486,13 @@ function CacheApp({ session }: { session: Session }) {
                 </select>
                 <button
                   onClick={() => selectedAlbumId && handleRenameAlbum(selectedAlbumId)}
-                  className="text-sm text-gray-500 hover:text-black"
+                  className="text-sm text-zinc-500 transition-colors hover:text-zinc-900"
                 >
                   Rename
                 </button>
                 <button
                   onClick={() => selectedAlbumId && handleDeleteAlbum(selectedAlbumId)}
-                  className="text-sm text-red-500 hover:text-red-700"
+                  className="text-sm text-red-500 transition-colors hover:text-red-700"
                 >
                   Delete album
                 </button>
@@ -496,14 +503,14 @@ function CacheApp({ session }: { session: Session }) {
         </>
       ) : tagResults !== null ? (
         <>
-          <h2 className="mb-4 text-lg font-semibold capitalize">
+          <h2 className="mb-5 text-xl font-bold tracking-tight text-zinc-900 capitalize">
             {selectedTag} ({tagResults.length})
           </h2>
           {renderGrid(tagResults)}
         </>
       ) : flatView ? (
         <>
-          <h2 className="mb-4 text-lg font-semibold">
+          <h2 className="mb-5 text-xl font-bold tracking-tight text-zinc-900">
             All screenshots ({byTag(screenshots).length})
           </h2>
           {renderGrid(byTag(screenshots))}
@@ -512,8 +519,8 @@ function CacheApp({ session }: { session: Session }) {
         <>
           {albums.length > 0 && (
             <>
-              <h2 className="mb-4 text-lg font-semibold">Albums</h2>
-              <div className="mb-8 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
+              <h2 className="mb-5 text-xl font-bold tracking-tight text-zinc-900">Albums</h2>
+              <div className="mb-10 grid grid-cols-2 gap-6 sm:grid-cols-3 md:grid-cols-4">
                 {albums.map((album) => {
                   const albumShots = screenshots.filter(
                     (s) => s.album_id === album.id
@@ -543,7 +550,7 @@ function CacheApp({ session }: { session: Session }) {
 
           {ungroupedScreenshots.length > 0 && (
             <>
-              <h2 className="mb-4 text-lg font-semibold">All screenshots</h2>
+              <h2 className="mb-5 text-xl font-bold tracking-tight text-zinc-900">All screenshots</h2>
               {renderGrid(ungroupedScreenshots)}
             </>
           )}

@@ -54,11 +54,11 @@ export function ScreenshotDetailModal({
       }}
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
     >
-      <div className="max-h-full w-full max-w-2xl overflow-y-auto rounded-lg bg-white p-4">
+      <div className="max-h-full w-full max-w-2xl overflow-y-auto rounded-2xl bg-white p-6 shadow-xl">
         <div className="mb-3 flex justify-end">
           <button
             onClick={onClose}
-            className="text-xl leading-none text-gray-500 hover:text-black"
+            className="flex h-8 w-8 items-center justify-center rounded-full text-lg leading-none text-zinc-400 transition-colors hover:bg-zinc-100 hover:text-zinc-900"
             aria-label="Close"
           >
             ×
@@ -68,7 +68,7 @@ export function ScreenshotDetailModal({
         <img
           src={screenshot.file_url}
           alt={screenshot.file_name}
-          className="mb-4 w-full rounded-lg object-contain"
+          className="mb-5 w-full rounded-xl object-contain"
         />
 
         {screenshot.status === "failed" && (
@@ -90,11 +90,11 @@ export function ScreenshotDetailModal({
         )}
 
         {screenshot.description && (
-          <p className="mb-3 text-base">{screenshot.description}</p>
+          <p className="mb-3 text-base text-zinc-700">{screenshot.description}</p>
         )}
 
         {screenshot.tags && screenshot.tags.length > 0 && (
-          <div className="mb-3 flex flex-wrap gap-1">
+          <div className="mb-4 flex flex-wrap gap-1.5">
             {screenshot.tags.map((tag) => {
               const colors = colorForTag(tag);
               return (
@@ -111,24 +111,24 @@ export function ScreenshotDetailModal({
         )}
 
         {screenshot.extracted_text && (
-          <div className="mt-3 border-t pt-3">
-            <p className="mb-1 text-xs font-medium tracking-wide text-gray-400 uppercase">
+          <div className="mt-4 border-t border-zinc-100 pt-4">
+            <p className="mb-1 text-xs font-medium tracking-wide text-zinc-400 uppercase">
               Extracted text
             </p>
-            <p className="text-sm whitespace-pre-wrap text-gray-700">
+            <p className="text-sm leading-relaxed whitespace-pre-wrap text-zinc-600">
               {screenshot.extracted_text}
             </p>
           </div>
         )}
 
-        <div className="mt-3 border-t pt-3">
-          <label className="mb-1 block text-xs font-medium tracking-wide text-gray-400 uppercase">
+        <div className="mt-4 border-t border-zinc-100 pt-4">
+          <label className="mb-1 block text-xs font-medium tracking-wide text-zinc-400 uppercase">
             Album
           </label>
           <select
             value={screenshot.album_id ?? NO_ALBUM_VALUE}
             onChange={handleAlbumChange}
-            className="w-full rounded-lg border px-3 py-2 text-sm"
+            className="w-full rounded-xl border border-zinc-200 px-3 py-2 text-sm text-zinc-700 transition-colors focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/30 focus:outline-none"
           >
             <option value={NO_ALBUM_VALUE}>No album</option>
             {albums.map((album) => (

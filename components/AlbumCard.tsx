@@ -29,7 +29,7 @@ export function AlbumCard({
     <div className="relative">
       <button
         onClick={onClick}
-        className="flex w-full flex-col overflow-hidden rounded-lg border text-left hover:shadow-md"
+        className="flex w-full flex-col overflow-hidden rounded-2xl border border-zinc-200 bg-white text-left shadow-sm transition-all duration-200 hover:-translate-y-1 hover:scale-[1.02] hover:shadow-lg"
       >
         {coverUrl ? (
           <img
@@ -38,13 +38,13 @@ export function AlbumCard({
             className="aspect-square w-full object-cover"
           />
         ) : (
-          <div className="flex aspect-square w-full items-center justify-center bg-gray-100 text-gray-400">
+          <div className="flex aspect-square w-full items-center justify-center bg-zinc-100 text-zinc-400">
             No photos
           </div>
         )}
-        <div className="p-2">
-          <p className="truncate text-sm font-medium">{album.name}</p>
-          <p className="mb-1 text-xs text-gray-500">
+        <div className="p-3">
+          <p className="truncate text-sm font-medium text-zinc-900">{album.name}</p>
+          <p className="mb-1.5 text-xs text-zinc-400">
             {count} screenshot{count === 1 ? "" : "s"}
           </p>
           {visibleCategories.length > 0 && (
@@ -71,7 +71,7 @@ export function AlbumCard({
           e.stopPropagation();
           onRename();
         }}
-        className="absolute top-2 right-2 flex h-7 w-7 items-center justify-center rounded-full bg-black/70 text-white"
+        className="absolute top-3 right-3 flex h-7 w-7 items-center justify-center rounded-full bg-black/70 text-white transition-colors hover:bg-black/90"
         aria-label="Rename album"
       >
         ✎

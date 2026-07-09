@@ -47,19 +47,22 @@ export function ScreenshotCard({
   }
 
   return (
-    <div className="relative cursor-pointer" onClick={handleCardClick}>
+    <div
+      className="relative cursor-pointer rounded-2xl bg-white p-2.5 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:scale-[1.02] hover:shadow-lg"
+      onClick={handleCardClick}
+    >
       <img
         src={file_url}
         alt={file_name}
-        className={`aspect-square w-full rounded-lg object-cover ${
-          selectMode && selected ? "ring-2 ring-black ring-offset-2" : ""
+        className={`aspect-square w-full rounded-xl object-cover ${
+          selectMode && selected ? "ring-2 ring-indigo-600 ring-offset-2" : ""
         }`}
       />
 
       {selectMode ? (
         <div
-          className={`absolute top-2 right-2 flex h-6 w-6 items-center justify-center rounded-full border-2 border-white ${
-            selected ? "bg-black" : "bg-black/40"
+          className={`absolute top-3 right-3 flex h-6 w-6 items-center justify-center rounded-full border-2 border-white ${
+            selected ? "bg-indigo-600" : "bg-black/40"
           }`}
         >
           {selected && (
@@ -73,20 +76,20 @@ export function ScreenshotCard({
             onDelete();
           }}
           disabled={deleting}
-          className="absolute top-2 right-2 flex h-7 w-7 items-center justify-center rounded-full bg-black/70 text-white disabled:opacity-50"
+          className="absolute top-3 right-3 flex h-7 w-7 items-center justify-center rounded-full bg-black/70 text-white transition-colors hover:bg-black/90 disabled:opacity-50"
           aria-label="Remove screenshot"
         >
           ×
         </button>
       )}
 
-      <div className="mt-1 flex flex-wrap items-center gap-1">
+      <div className="mt-2 flex flex-wrap items-center gap-1.5">
         {status === "failed" ? (
           <span className="rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-800">
             failed
           </span>
         ) : status === "pending" ? (
-          <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600">
+          <span className="rounded-full bg-zinc-100 px-2 py-0.5 text-xs font-medium text-zinc-500">
             processing...
           </span>
         ) : normalizedCategory !== "other" ? (
@@ -111,7 +114,7 @@ export function ScreenshotCard({
           );
         })}
         {overflowCount > 0 && (
-          <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-600">
+          <span className="rounded-full bg-zinc-100 px-2 py-0.5 text-xs text-zinc-500">
             +{overflowCount}
           </span>
         )}
