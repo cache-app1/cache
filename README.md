@@ -2,9 +2,9 @@
 
 **Stop scrolling. Start searching.**
 
-You've got hundreds of screenshots - recipes, travel plans, receipts, outfits - and no real way to find any of them. Cache reads every screenshot with AI, works out what it is, and lets you search your whole camera roll in plain English. You don't have to remember *when* you saved something, just *what* it was.
+You've got hundreds of screenshots - recipes, travel plans, receipts, outfits - and no real way to find any of them. Cache reads every screenshot with AI, understands what's in it, and lets you search your whole camera roll in plain English. You don't have to remember *when* you saved something, just *what* it was.
 
-**[Try it live →](https://cache-cacheshots.vercel.app)**
+**[Try it live →](https://cacheapp.vercel.app/)**
 
 <p align="center">
   <img src="cache-demo.png" alt="The Cache app: a searchable grid of categorized screenshots" width="640">
