@@ -56,7 +56,11 @@ function CacheApp({ session }: { session: Session }) {
     }
   }
 
+  // The onboarding banner is shown based on localStorage, which only exists
+  // on the client, so it has to be set after mount rather than in initial
+  // state (that would cause a server/client hydration mismatch).
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     loadScreenshots();
     loadAlbums();
     if (!localStorage.getItem(ONBOARDING_KEY)) {
